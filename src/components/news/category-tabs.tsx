@@ -49,7 +49,7 @@ export default function CategoryTabs() {
   };
 
   return (
-    <div className="mb-8 overflow-x-auto pb-2">
+    <div className="mb-8 flex justify-center overflow-x-auto pb-2">
       {/* Liquid glass container with shimmer */}
       <div 
         ref={containerRef}
