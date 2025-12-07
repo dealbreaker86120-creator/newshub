@@ -15,6 +15,12 @@ export default function NewsGrid({ initialArticles, category }: NewsGridProps) {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [lastUpdated, setLastUpdated] = useState(new Date());
   const [countdown, setCountdown] = useState(60);
+  const [isMounted, setIsMounted] = useState(false);
+
+  // Set mounted state after hydration
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   const fetchNews = async () => {
     setIsRefreshing(true);
@@ -93,7 +99,7 @@ export default function NewsGrid({ initialArticles, category }: NewsGridProps) {
             </div>
             <div className="h-4 w-px bg-[rgba(240,246,252,0.1)]" />
             <div className="text-sm text-[#8b949e] transition-all duration-300 group-hover:translate-x-1">
-              Last updated: <span className="font-medium text-white">{lastUpdated.toLocaleTimeString()}</span>
+              Last updated: <span className="font-medium text-white">{isMounted ? lastUpdated.toLocaleTimeString() : '--:--:--'}</span>
             </div>
             <div className="h-4 w-px bg-[rgba(240,246,252,0.1)]" />
             <div className="text-sm text-[#8b949e]">

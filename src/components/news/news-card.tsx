@@ -4,7 +4,7 @@ import { NewsArticle } from '@/lib/types/news';
 import { Clock, ExternalLink, Sparkles } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import Image from 'next/image';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import AutoTagButton from '@/components/image-tags/auto-tag-button';
 import ImageTagDisplay from '@/components/image-tags/image-tag-display';
 
@@ -17,9 +17,17 @@ interface NewsCardProps {
 export default function NewsCard({ article, featured = false, index = 0 }: NewsCardProps) {
   const [tags, setTags] = useState<any>(null);
   const [showTags, setShowTags] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
+
+  // Set mounted state after hydration
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   // Safely parse the date
   const getTimeAgo = () => {
+    if (!isMounted) return 'Recently';
+    
     try {
       const date = new Date(article.publishedAt);
       if (isNaN(date.getTime())) {
