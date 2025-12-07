@@ -4,7 +4,7 @@ import { fetchTopHeadlines, fetchEverything, NEWS_DOMAINS } from '@/lib/newsapi'
 import { fetchGoogleNewsRss } from '@/lib/google-news-rss';
 import { dailyLimiter } from '@/lib/rateLimit';
 
-export const revalidate = 60; // ISR: revalidate every 1 minute for latest news
+export const revalidate = 30; // ISR: revalidate every 30 seconds for faster updates
 
 export async function GET(request: NextRequest) {
   try {
@@ -13,7 +13,7 @@ export async function GET(request: NextRequest) {
     const category = searchParams.get('category');
     const country = searchParams.get('country') || 'US';
     const language = searchParams.get('language') || 'en';
-    const pageSize = Math.min(parseInt(searchParams.get('pageSize') || '50'), 100);
+    const pageSize = Math.min(parseInt(searchParams.get('pageSize') || '30'), 50); // Default to 30 for faster loading
     const page = parseInt(searchParams.get('page') || '1');
     const source = searchParams.get('source') || 'google'; // 'google' or 'newsapi'
 
@@ -32,7 +32,8 @@ export async function GET(request: NextRequest) {
         });
 
         if (googleArticles.length > 0) {
-          articles = googleArticles;
+          // Limit results for faster initial load
+          articles = googleArticles.slice(0, pageSize);
           totalResults = googleArticles.length;
           usedSource = 'google-news-rss';
         }
@@ -150,7 +151,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(result, {
       headers: {
-        'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=120',
+        'Cache-Control': 'public, s-maxage=30, stale-while-revalidate=60', // Faster cache refresh
         'X-News-Source': usedSource, // Indicate which source was used
       },
     });

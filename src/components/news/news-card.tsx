@@ -1,7 +1,7 @@
 "use client";
 
 import { NewsArticle } from '@/lib/types/news';
-import { Clock, ExternalLink, Sparkles } from 'lucide-react';
+import { Clock, ExternalLink } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import Image from 'next/image';
 import { useState, useEffect } from 'react';
@@ -69,9 +69,11 @@ export default function NewsCard({ article, featured = false, index = 0 }: NewsC
                 src={article.urlToImage}
                 alt={article.title}
                 fill
+                priority
                 sizes="(max-width: 640px) 100vw, (max-width: 1024px) 100vw, 1200px"
                 className="object-cover transition-all duration-700 group-hover:scale-110 group-hover:brightness-110"
-                unoptimized
+                placeholder="blur"
+                blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mM8c+Z8PQAHVALI8GDtfQAAAABJRU5ErkJggg=="
               />
               {/* Image overlay gradient */}
               <div className="absolute inset-0 bg-gradient-to-t from-[#0d1117] via-transparent to-transparent opacity-60" />
@@ -137,17 +139,17 @@ export default function NewsCard({ article, featured = false, index = 0 }: NewsC
   return (
     <div className="space-y-3">
       <div
-        className="group relative block overflow-hidden rounded-lg border border-[rgba(240,246,252,0.1)] bg-[rgba(22,27,34,0.6)] backdrop-blur-xl transition-all duration-500 hover:border-purple-500/50 hover:shadow-[0_0_30px_rgba(163,113,247,0.3)] hover:scale-[1.03] hover:-translate-y-1"
+        className="group relative block overflow-hidden rounded-lg border border-[rgba(240,246,252,0.1)] bg-[rgba(22,27,34,0.6)] backdrop-blur-xl transition-all duration-300 hover:border-purple-500/50 hover:shadow-[0_0_30px_rgba(163,113,247,0.3)] hover:scale-[1.02]"
         style={{
-          animation: `fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) ${index * 0.08}s backwards`
+          animation: `fadeInUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) ${Math.min(index * 0.05, 1)}s backwards`
         }}
       >
         {/* Liquid glass background on hover */}
-        <div className="pointer-events-none absolute inset-0 scale-95 rounded-lg bg-gradient-to-br from-purple-500/10 via-transparent to-pink-500/10 opacity-0 backdrop-blur-xl transition-all duration-500 group-hover:scale-100 group-hover:opacity-100" />
+        <div className="pointer-events-none absolute inset-0 scale-95 rounded-lg bg-gradient-to-br from-purple-500/10 via-transparent to-pink-500/10 opacity-0 backdrop-blur-xl transition-all duration-300 group-hover:scale-100 group-hover:opacity-100" />
         
         {/* Shimmer effect */}
-        <div className="pointer-events-none absolute inset-0 overflow-hidden rounded-lg opacity-0 transition-opacity duration-500 group-hover:opacity-100">
-          <div className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/15 to-transparent transition-transform duration-1000 group-hover:translate-x-full" />
+        <div className="pointer-events-none absolute inset-0 overflow-hidden rounded-lg opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+          <div className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/15 to-transparent transition-transform duration-700 group-hover:translate-x-full" />
         </div>
 
         <div className="relative z-10">
@@ -157,9 +159,11 @@ export default function NewsCard({ article, featured = false, index = 0 }: NewsC
                 src={article.urlToImage}
                 alt={article.title}
                 fill
+                loading="lazy"
                 sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, 33vw"
-                className="object-cover transition-all duration-700 group-hover:scale-110 group-hover:brightness-110"
-                unoptimized
+                className="object-cover transition-all duration-500 group-hover:scale-110 group-hover:brightness-110"
+                placeholder="blur"
+                blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mM8c+Z8PQAHVALI8GDtfQAAAABJRU5ErkJggg=="
               />
               
               {/* AI Tag Button Overlay */}
@@ -176,14 +180,14 @@ export default function NewsCard({ article, featured = false, index = 0 }: NewsC
           )}
           
           <div className="p-3 sm:p-4">
-            <div className="mb-2 sm:mb-3 flex items-center gap-2 text-xs sm:text-sm text-[#8b949e] transition-all duration-300 group-hover:translate-x-1">
-              <span className="relative font-medium text-[#2da44e] transition-all duration-300 group-hover:scale-105">
-                <span className="absolute inset-0 animate-pulse rounded bg-[#2da44e]/20 opacity-0 blur-md transition-opacity duration-300 group-hover:opacity-100" />
+            <div className="mb-2 sm:mb-3 flex items-center gap-2 text-xs sm:text-sm text-[#8b949e] transition-all duration-200 group-hover:translate-x-1">
+              <span className="relative font-medium text-[#2da44e] transition-all duration-200 group-hover:scale-105">
+                <span className="absolute inset-0 animate-pulse rounded bg-[#2da44e]/20 opacity-0 blur-md transition-opacity duration-200 group-hover:opacity-100" />
                 <span className="relative">{article.source.name}</span>
               </span>
               <span>•</span>
               <div className="flex items-center gap-1">
-                <Clock className="h-3 w-3 sm:h-3.5 sm:w-3.5 transition-transform duration-300 group-hover:rotate-12" />
+                <Clock className="h-3 w-3 sm:h-3.5 sm:w-3.5 transition-transform duration-200 group-hover:rotate-12" />
                 <span>{timeAgo}</span>
               </div>
             </div>
@@ -197,7 +201,7 @@ export default function NewsCard({ article, featured = false, index = 0 }: NewsC
                 {article.title}
               </h3>
               {article.description && (
-                <p className="line-clamp-2 text-xs sm:text-sm text-[#7d8590] transition-colors duration-300 group-hover:text-[#8b949e]">{article.description}</p>
+                <p className="line-clamp-2 text-xs sm:text-sm text-[#7d8590] transition-colors duration-200 group-hover:text-[#8b949e]">{article.description}</p>
               )}
             </a>
           </div>

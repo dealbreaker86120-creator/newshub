@@ -10,10 +10,11 @@ async function getNews(category?: NewsCategory, query?: string) {
   
   if (category) params.set('category', category);
   if (query) params.set('q', query);
+  params.set('pageSize', '30'); // Reduce initial load to 30 articles for faster performance
   
   try {
     const response = await fetch(`${baseUrl}/api/news?${params.toString()}`, {
-      next: { revalidate: 60 },
+      next: { revalidate: 30 }, // Reduce revalidation to 30s for faster updates
     });
     
     if (!response.ok) {
@@ -33,7 +34,7 @@ async function getNews(category?: NewsCategory, query?: string) {
 function NewsGridSkeleton() {
   return (
     <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-      {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((i) => (
+      {[1, 2, 3, 4, 5, 6].map((i) => (
         <div
           key={i}
           className="group relative overflow-hidden rounded-xl border border-[rgba(240,246,252,0.1)] bg-[#161b22] p-4"
