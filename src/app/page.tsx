@@ -2,6 +2,7 @@ import NavigationHeader from "@/components/sections/navigation-header";
 import NewsGrid from "@/components/news/news-grid";
 import CategoryTabs from "@/components/news/category-tabs";
 import { NewsCategory } from "@/lib/types/news";
+import { Suspense } from "react";
 
 async function getNews(category?: NewsCategory, query?: string) {
   const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
@@ -12,7 +13,7 @@ async function getNews(category?: NewsCategory, query?: string) {
   
   try {
     const response = await fetch(`${baseUrl}/api/news?${params.toString()}`, {
-      next: { revalidate: 60 }, // 1 minute for latest news
+      next: { revalidate: 60 },
     });
     
     if (!response.ok) {
@@ -28,13 +29,43 @@ async function getNews(category?: NewsCategory, query?: string) {
   }
 }
 
+// Skeleton loader component
+function NewsGridSkeleton() {
+  return (
+    <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+      {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((i) => (
+        <div
+          key={i}
+          className="group relative overflow-hidden rounded-xl border border-[rgba(240,246,252,0.1)] bg-[#161b22] p-4"
+        >
+          <div className="mb-4 h-48 w-full rounded-lg bg-[#0d1117] animate-pulse" />
+          <div className="mb-3 h-5 w-20 rounded bg-[#0d1117] animate-pulse" />
+          <div className="mb-2 h-6 w-full rounded bg-[#0d1117] animate-pulse" />
+          <div className="mb-3 h-6 w-3/4 rounded bg-[#0d1117] animate-pulse" />
+          <div className="mb-2 h-4 w-full rounded bg-[#0d1117] animate-pulse" />
+          <div className="mb-4 h-4 w-5/6 rounded bg-[#0d1117] animate-pulse" />
+          <div className="flex items-center justify-between">
+            <div className="h-4 w-24 rounded bg-[#0d1117] animate-pulse" />
+            <div className="h-4 w-16 rounded bg-[#0d1117] animate-pulse" />
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+// Async component for news content
+async function NewsContent({ category, query }: { category?: NewsCategory; query?: string }) {
+  const articles = await getNews(category, query);
+  return <NewsGrid initialArticles={articles} category={category} />;
+}
+
 export default async function Home({
   searchParams,
 }: {
   searchParams: Promise<{ category?: NewsCategory; q?: string }>;
 }) {
   const params = await searchParams;
-  const articles = await getNews(params.category, params.q);
 
   return (
     <main className="min-h-screen bg-[#0d1117]">
@@ -86,7 +117,7 @@ export default async function Home({
         </div>
       </section>
 
-      {/* News Content with Animation */}
+      {/* News Content with Suspense Streaming */}
       <section 
         className="container mx-auto px-6 py-12"
         style={{
@@ -94,7 +125,9 @@ export default async function Home({
         }}
       >
         <CategoryTabs />
-        <NewsGrid initialArticles={articles} category={params.category} />
+        <Suspense fallback={<NewsGridSkeleton />}>
+          <NewsContent category={params.category} query={params.q} />
+        </Suspense>
       </section>
 
       {/* Footer with Liquid Glass */}
